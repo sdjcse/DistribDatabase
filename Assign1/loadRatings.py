@@ -1,24 +1,21 @@
 from crudOperations import *
+from Interface import *
 import time
 
-def loadRatings():
-
+def loadRatings(ratingstablename, ratingsfilepath, openconnection):
     # Timer to measure the total time taken
     start = time.time()
 
-    # create Database to read data
+    # create table to read data
+    createTableForLoading(openconnection,ratingstablename)
 
-    # read data from the file
-    fileName = "data/ratings.dat"
-    tableName = "moviedetails"
     # using copy from to do bulk insert
-    bulkInsert(fileName,tableName)
-    #for line in open(fileName):
-    #    insertAllVals("moviedetails",line.split("::"))
+    bulkInsert(ratingsfilepath,ratingstablename,openconnection)
 
     # dropping unnecessary columns
+    alterAfterLoading(openconnection,ratingstablename)
 
     print "Inserting successful"
     print time.time() - start
 
-loadRatings()
+#loadRatings("allmovieratings","data/ratings.dat",getopenconnection())

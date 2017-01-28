@@ -20,7 +20,7 @@ import psycopg2
 import datetime
 import time
 
-import Assignment as MyAssignment  # TODO: Change the 'Assignment' to your filename
+import allFuns as MyAssignment  # TODO: Change the 'Assignment' to your filename
 
 
 # SETUP Functions

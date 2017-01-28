@@ -16,6 +16,7 @@ def testerMethod():
     con = dbConnector()
     cursor = con.cursor()
     print "test"
+    print "here"
     cursor.execute('SHOW work_mem')
 
-testerMethod()
+#testerMethod()
