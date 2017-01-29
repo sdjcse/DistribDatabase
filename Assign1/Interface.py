@@ -3,6 +3,13 @@
 # Interface for the assignement
 #
 
+from deletePart import *
+from loadRatings import *
+from rangeInsert import *
+from rangePartition import *
+from roundRobinPartition import *
+from rrobinInsert import *
+
 import psycopg2
 
 DATABASE_NAME = 'dds_assgn1'
@@ -13,23 +20,23 @@ def getopenconnection(user='postgres', password='1234', dbname='dds_assgn1'):
 
 
 def loadratings(ratingstablename, ratingsfilepath, openconnection):
-    pass
+    loadRatings(ratingstablename, ratingsfilepath, openconnection)
 
 
 def rangepartition(ratingstablename, numberofpartitions, openconnection):
-    pass
+    rangepartitionWork(ratingstablename, numberofpartitions, openconnection)
 
 
 def roundrobinpartition(ratingstablename, numberofpartitions, openconnection):
-    pass
+    roundrobinpartitionWork(ratingstablename, numberofpartitions, openconnection)
 
 
 def roundrobininsert(ratingstablename, userid, itemid, rating, openconnection):
-    pass
+    roundrobininsertWork(ratingstablename, userid, itemid, rating, openconnection)
 
 
 def rangeinsert(ratingstablename, userid, itemid, rating, openconnection):
-    pass
+    rangeinsertWork(ratingstablename, userid, itemid, rating, openconnection)
 
 
 def create_db(dbname):

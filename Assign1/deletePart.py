@@ -11,7 +11,7 @@ def deleteAll(openConnection):
     rangeCount = getPartCount(rangePref,openConnection)
     robinCount = getPartCount(robinPref,openConnection)
 
-    deleteTables(mainTab,openConnection)
+    #deleteTables(mainTab,openConnection)
     for x in range(0,rangeCount):
         deleteTables(rangePref+str(x),openConnection)
     for x in range(0,robinCount):

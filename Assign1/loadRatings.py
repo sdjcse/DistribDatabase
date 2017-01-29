@@ -18,4 +18,4 @@ def loadRatings(ratingstablename, ratingsfilepath, openconnection):
     print "Inserting successful"
     print time.time() - start
 
-#loadRatings("allmovieratings","data/ratings.dat",getopenconnection())
+#loadRatings("allmovieratings","data/test.dat",getopenconnection())

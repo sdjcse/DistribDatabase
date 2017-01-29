@@ -1,5 +1,3 @@
-from Interface import *
-
 def alterAfterLoading(openconnection,ratingstablename):
     queryString = """ ALTER TABLE """ + ratingstablename + """
                         DROP COLUMN dummy1,
@@ -12,7 +10,6 @@ def alterAfterLoading(openconnection,ratingstablename):
     openconnection.commit()
 
 def createTableForLoading(openconnection,ratingstablename):
-    con = getopenconnection()
     queryString = """ CREATE TABLE """ + ratingstablename + """(
         userid INTEGER,
         dummy1 CHAR,
