@@ -64,4 +64,4 @@ def PointQuery(ratingsTableName, ratingValue, openconnection):
             writeIntoFile(outFileName, roundRobinConst + str(i), results)
 
 #RangeQuery("",1,2,getOpenConnection())
-PointQuery("",5,getOpenConnection())
+#PointQuery("",5,getOpenConnection())
