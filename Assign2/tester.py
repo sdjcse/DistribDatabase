@@ -36,7 +36,7 @@ if __name__ == '__main__':
         Assignment1.roundRobinPartition('ratings', 5, con);
 
         # Deleting Ratings Table because Point Query and Range Query should not use ratings table instead they should use partitions.
-        Assignment1.deleteTables('ratings', con);
+        #Assignment1.deleteTables('ratings', con);
 
         # Calling RangeQuery
         print "Performing Range Query"
@@ -49,7 +49,7 @@ if __name__ == '__main__':
         #Assignment2.PointQuery('ratings',2,con);
         
         # Deleting All Tables
-        Assignment1.deleteTables('all', con);
+        #Assignment1.deleteTables('all', con);
 
         if con:
             con.close()
