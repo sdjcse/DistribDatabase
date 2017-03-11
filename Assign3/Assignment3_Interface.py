@@ -6,6 +6,8 @@
 import psycopg2
 import os
 import sys
+import thread
+import threading
 from crudOperations import *
 
 ##################### This needs to changed based on what kind of table we want to sort. ##################
@@ -18,14 +20,67 @@ JOIN_COLUMN_NAME_FIRST_TABLE = 'column1'
 JOIN_COLUMN_NAME_SECOND_TABLE = 'column2'
 ##########################################################################################################
 
+threads = ["t1","t2","t3","t4","t5"]
+threadList = []
+
+class threadHelper(threading.Thread):
+    def __init__(self, threadID, name,openconnection, InputTable, OutputTable, SortingColumnName,minVal,maxVal,firstThreadBool):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.openconnection = openconnection
+        self.InputTable = InputTable
+        self.OutputTable = OutputTable
+        self.SortingColumnName = SortingColumnName
+        self.minVal = minVal
+        self.maxVal = maxVal
+        self.firstThreadBool = firstThreadBool
+        self.name = name
+    def run(self):
+        print "Starting " + self.name
+        threadProcessor(self.name,self.openconnection,self.InputTable,self.OutputTable,self.SortingColumnName,self.minVal,self.maxVal,self.firstThreadBool)
+        print "Exiting " + self.name
 
 # Donot close the connection inside this file i.e. do not perform openconnection.close()
 def ParallelSort (InputTable, SortingColumnName, OutputTable, openconnection):
     #Implement ParallelSort Here.
+    createOutputTable(OutputTable, InputTable, openconnection)
     maxVal = getMaxMinOfAColumn(InputTable,openconnection,SortingColumnName,"MAX")
     minVal = getMaxMinOfAColumn(InputTable,openconnection,SortingColumnName,"MIN")
+    interval = maxVal - minVal
+    interval = float(interval)/5
+    #data = selectFun(openconnection,InputTable,SortingColumnName,minVal,minVal+interval,True)
+    #print data[0]
+    count = 1
+    #insertIntoTable(openconnection, OutputTable, data)
+    for t in threads:
+        if t is "t1":
+            threadInst = threadHelper(count,t, openconnection, InputTable, OutputTable, SortingColumnName,minVal,minVal+interval,True)
+        else:
+            threadInst = threadHelper(count, t, openconnection, InputTable, OutputTable, SortingColumnName, minVal,minVal + interval, False)
+        count+=1
+        threadList.append(threadInst)
+        threadInst.start()
+        minVal = minVal+interval
 
-    pass #Remove this once you are done with implementation
+def threadProcessor(threadName,openconnection,InputTable,OutputTable,SortingColumnName,firstVal,secondVal,firstThreadBool):
+    data = selectFun(openconnection,InputTable,SortingColumnName,firstVal,secondVal,firstThreadBool)
+    for t in threadList:
+        if t.name is not threadName:
+            t.join()
+        else:
+            break
+    insertIntoTable(openconnection,OutputTable,data)
+
+
+def selectFun(openconnection,InputTable,SortingColumnName,firstVal,secondVal,firstThreadBool):
+    sortCols = [SortingColumnName,SortingColumnName]
+    oper = ["g","le"]
+    if firstThreadBool:
+        oper[0] = "ge"
+    conds = [firstVal,secondVal]
+    data = selectData(openconnection, "*", InputTable, sortCols, conds, oper)
+    data = sorted(data, key=lambda x: x[0])
+    return data
 
 def ParallelJoin (InputTable1, InputTable2, Table1JoinColumn, Table2JoinColumn, OutputTable, openconnection):
     #Implement ParallelJoin Here.

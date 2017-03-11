@@ -1,3 +1,5 @@
+from numbers import Number
+
 def alterAfterLoading(openconnection,ratingstablename):
     queryString = """ ALTER TABLE """ + ratingstablename + """
                         DROP COLUMN dummy1,
@@ -145,3 +147,38 @@ def getMaxMinOfAColumn(tableName,openConnection,columnName,maxMin):
     cursor.execute(queryString)
     temp = cursor.fetchall()
     return temp[0][0]
+
+def createOutputTable(OutputTable,InputTable,openConnection):
+    checkQuery = "select COUNT(*) from pg_tables where tablename = \'<>\' "
+    checkQuery = checkQuery.replace("<>", OutputTable.lower())
+    queryString = """CREATE TABLE """ + OutputTable + """ (LIKE """ + InputTable + """) """
+    cursor = openConnection.cursor()
+    cursor.execute(checkQuery)
+    count = cursor.fetchone()[0]
+    if count == 0:
+        cursor.execute(queryString)
+    else:
+        print 'Table exists alread'
+    openConnection.commit()
+
+def insertIntoTable(openconnection,OutputTable,data):
+    cursor = openconnection.cursor()
+    countCols = "select count(*) from information_schema.columns where table_name='"+ OutputTable.lower() + "'"
+    cursor.execute(countCols)
+    temp = cursor.fetchall()
+    questString = ""
+    insList = []
+    for tup in data:
+        for i in range(len(tup)):
+            if not isinstance(tup[i],Number):
+                insList.append("\'"+tup[i]+"\'")
+            else:
+                insList.append(tup[i])
+        queryString = "INSERT INTO " + OutputTable.lower() + " VALUES("
+        for i in insList:
+            queryString += str(i) + ","
+        queryString =  queryString[:-1]
+        queryString += ")"
+        cursor.execute(queryString)
+        insList = []
+    openconnection.commit()
