@@ -6,6 +6,7 @@
 import psycopg2
 import os
 import sys
+from crudOperations import *
 
 ##################### This needs to changed based on what kind of table we want to sort. ##################
 ##################### To know how to change this, see Assignment 3 Instructions carefully #################
@@ -21,6 +22,9 @@ JOIN_COLUMN_NAME_SECOND_TABLE = 'column2'
 # Donot close the connection inside this file i.e. do not perform openconnection.close()
 def ParallelSort (InputTable, SortingColumnName, OutputTable, openconnection):
     #Implement ParallelSort Here.
+    maxVal = getMaxMinOfAColumn(InputTable,openconnection,SortingColumnName,"MAX")
+    minVal = getMaxMinOfAColumn(InputTable,openconnection,SortingColumnName,"MIN")
+
     pass #Remove this once you are done with implementation
 
 def ParallelJoin (InputTable1, InputTable2, Table1JoinColumn, Table2JoinColumn, OutputTable, openconnection):
@@ -79,7 +83,7 @@ def deleteTables(ratingstablename, openconnection):
         sys.exit(1)
     except IOError, e:
         if openconnection:
-            conn.rollback()
+            openconnection.rollback()
         print 'Error %s' % e
         sys.exit(1)
     finally:
@@ -105,7 +109,7 @@ def saveTable(ratingstablename, fileName, openconnection):
         sys.exit(1)
     except IOError, e:
         if openconnection:
-            conn.rollback()
+            openconnection.rollback()
         print 'Error %s' % e
         sys.exit(1)
     finally:
@@ -114,29 +118,29 @@ def saveTable(ratingstablename, fileName, openconnection):
 
 if __name__ == '__main__':
     try:
-	# Creating Database ddsassignment3
-	print "Creating Database named as ddsassignment3"
-	createDB();
-	
-	# Getting connection to the database
-	print "Getting connection from the ddsassignment3 database"
-	con = getOpenConnection();
+        # Creating Database ddsassignment3
+        print "Creating Database named as ddsassignment3"
+        createDB();
 
-	# Calling ParallelSort
-	print "Performing Parallel Sort"
-	ParallelSort(FIRST_TABLE_NAME, SORT_COLUMN_NAME_FIRST_TABLE, 'parallelSortOutputTable', con);
+        # Getting connection to the database
+        print "Getting connection from the ddsassignment3 database"
+        con = getOpenConnection();
 
-	# Calling ParallelJoin
-	print "Performing Parallel Join"
-	ParallelJoin(FIRST_TABLE_NAME, SECOND_TABLE_NAME, JOIN_COLUMN_NAME_FIRST_TABLE, JOIN_COLUMN_NAME_SECOND_TABLE, 'parallelJoinOutputTable', con);
-	
-	# Saving parallelSortOutputTable and parallelJoinOutputTable on two files
-	saveTable('parallelSortOutputTable', 'parallelSortOutputTable.txt', con);
-	saveTable('parallelJoinOutputTable', 'parallelJoinOutputTable.txt', con);
+        # Calling ParallelSort
+        print "Performing Parallel Sort"
+        ParallelSort(FIRST_TABLE_NAME, SORT_COLUMN_NAME_FIRST_TABLE, 'parallelSortOutputTable', con);
 
-	# Deleting parallelSortOutputTable and parallelJoinOutputTable
-	deleteTables('parallelSortOutputTable', con);
-       	deleteTables('parallelJoinOutputTable', con);
+        # Calling ParallelJoin
+        print "Performing Parallel Join"
+        ParallelJoin(FIRST_TABLE_NAME, SECOND_TABLE_NAME, JOIN_COLUMN_NAME_FIRST_TABLE, JOIN_COLUMN_NAME_SECOND_TABLE, 'parallelJoinOutputTable', con);
+
+        # Saving parallelSortOutputTable and parallelJoinOutputTable on two files
+        saveTable('parallelSortOutputTable', 'parallelSortOutputTable.txt', con);
+        saveTable('parallelJoinOutputTable', 'parallelJoinOutputTable.txt', con);
+
+        # Deleting parallelSortOutputTable and parallelJoinOutputTable
+        deleteTables('parallelSortOutputTable', con);
+        deleteTables('parallelJoinOutputTable', con);
 
         if con:
             con.close()

@@ -1,0 +1,4 @@
+* Connecting to Postgres Shell:
+    sudo -u postgres psql
+*   List all Databases - \l
+

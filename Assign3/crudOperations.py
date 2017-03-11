@@ -1,0 +1,147 @@
+def alterAfterLoading(openconnection,ratingstablename):
+    queryString = """ ALTER TABLE """ + ratingstablename + """
+                        DROP COLUMN dummy1,
+                        DROP COLUMN dummy2,
+                        DROP COLUMN dummy3,
+                        DROP COLUMN timeFromStart"""
+    cursor = openconnection.cursor()
+    cursor.execute(queryString)
+    cursor.close()
+    openconnection.commit()
+
+def createTableForLoading(openconnection,ratingstablename):
+    queryString = """ CREATE TABLE """ + ratingstablename + """(
+        userid INTEGER,
+        dummy1 CHAR,
+        movieid INTEGER,
+        dummy2 CHAR,
+        rating REAL,
+        dummy3 CHAR,
+        timeFromStart BIGINT)
+        """
+    cursor = openconnection.cursor()
+    cursor.execute(queryString)
+    cursor.close()
+    openconnection.commit()
+
+
+def bulkInsert(fileName,tableName,openConnection):
+    cursor = openConnection.cursor()
+    cursor.copy_from(open(fileName),tableName,sep=':')
+    openConnection.commit()
+
+
+def countData(openConnection,ratingsTableName):
+    cursor = openConnection.cursor()
+    queryString = "SELECT COUNT(*) FROM " + ratingsTableName
+    cursor.execute(queryString)
+    temp = cursor.fetchall()
+    return temp[0][0]
+
+def createPartitionTables(tableName,openConnection,sourceTable,minrange,maxrange,includeMin):
+    if includeMin:
+        queryString = """CREATE TABLE <> AS
+                         SELECT * FROM """ + sourceTable + """
+                         WHERE RATING >= """ + str(minrange) + """
+                         AND RATING <= """ + str(maxrange)
+    else:
+        queryString = """CREATE TABLE <> AS
+                                 SELECT * FROM """ + sourceTable + """
+                                 WHERE RATING > """ + str(minrange) + """
+                                 AND RATING <= """ + str(maxrange)
+    cursor = openConnection.cursor()
+    cursor.execute(queryString.replace("<>",tableName))
+    openConnection.commit()
+
+def createPartitionTablesForRoundRobin(tableName,openConnection,sourceTable,numberOfPartition,nthPart):
+    queryString = """ CREATE TABLE """ +tableName + """ AS
+                      WITH TEMPTABLE AS
+                      (
+                        SELECT ROW_NUMBER() OVER() as FILTER,* FROM """ + sourceTable +"""
+                      )
+                      SELECT userid,movieid,rating
+                      FROM TEMPTABLE
+                      WHERE (FILTER-"""+str(nthPart) +""")%""" + str(numberOfPartition)+ """ = 0
+                    """
+    cursor = openConnection.cursor()
+    cursor.execute(queryString)
+    openConnection.commit()
+
+def getPartCount(prefix,openConnection):
+    queryString = """ SELECT COUNT(*) FROM pg_stat_user_tables
+                      WHERE RELNAME LIKE '""" + prefix + """%'
+                    """
+    cursor = openConnection.cursor()
+    cursor.execute(queryString)
+    temp = cursor.fetchall()
+    return temp[0][0]
+
+def insertIntoTable(userid,movieid,rating,openConnection,table):
+    queryString = """ INSERT INTO """ + table + """
+                    VALUES(""" + str(userid)+ """ , """ + str(movieid) + """ , """ + str(rating) + """)
+                """
+    cursor = openConnection.cursor()
+    cursor.execute(queryString)
+    openConnection.commit()
+
+def deleteTables(table,openConnection):
+    queryString = "DROP TABLE " + table
+    openConnection.cursor().execute(queryString)
+    openConnection.commit()
+
+
+def selectData(openConnection,columns,tableName,condColumns,conds,oper):
+    cursor = openConnection.cursor()
+    queryString = "SELECT "
+    if columns is "*":
+        queryString += columns + " "
+    else:
+        for x in columns:
+            queryString += x+" "
+    queryString += " FROM " + tableName
+    if condColumns is not None:
+        queryString += " WHERE "
+        first = True
+        for x,y,z in zip(condColumns,conds,oper):
+            queryString += " " if (first) else " AND "
+            queryString += x
+            first = False
+            if z is "ge":
+                queryString += ">="
+            elif z is "le":
+                queryString += "<="
+            elif z is "e":
+                queryString += "="
+            elif z is "g":
+                queryString += ">"
+            elif z is "l":
+                queryString += "<"
+            queryString += str(y)
+
+    cursor.execute(queryString)
+    records = cursor.fetchall()
+    return records
+
+
+def createGenreTableforLoading(openConnection, tableName):
+    queryString = """ CREATE TABLE """ + tableName + """(
+        movieid INTEGER,
+        moviename CHAR(100),
+        genre CHAR(100)
+        )
+    """
+    cursor = openConnection.cursor()
+    cursor.execute(queryString)
+    openConnection.commit()
+
+def bulkInsert(fileName,tableName,openConnection,seperator):
+    cursor = openConnection.cursor()
+    cursor.copy_from(open(fileName),tableName,sep=seperator)
+    openConnection.commit()
+
+def getMaxMinOfAColumn(tableName,openConnection,columnName,maxMin):
+    queryString = """SELECT """+maxMin+"""(""" + columnName + """) FROM """+ tableName
+    cursor = openConnection.cursor()
+    cursor.execute(queryString)
+    temp = cursor.fetchall()
+    return temp[0][0]

@@ -1,0 +1,2 @@
+def selector(openConnection,tableName,start_range,end_range,column_name):
+
