@@ -50,11 +50,14 @@ class threadHelper(threading.Thread):
 # Donot close the connection inside this file i.e. do not perform openconnection.close()
 def ParallelSort (InputTable, SortingColumnName, OutputTable, openconnection):
     #Implement ParallelSort Here.
+    InputTable = InputTable.lower()
+    OutputTable = OutputTable.lower()
     createOutputTable(OutputTable, InputTable, openconnection)
     maxVal = getMaxMinOfAColumn(InputTable,openconnection,SortingColumnName,"MAX")
     minVal = getMaxMinOfAColumn(InputTable,openconnection,SortingColumnName,"MIN")
     interval = maxVal - minVal
     interval = float(interval)/5
+    SortingColumnName =SortingColumnName.lower()
     #data = selectFun(openconnection,InputTable,SortingColumnName,minVal,minVal+interval,True)
     #print data[0]
     count = 1
@@ -79,7 +82,7 @@ def threadProcessor(threadName,openconnection,InputTable,OutputTable,SortingColu
     insertIntoTable(openconnection,OutputTable,data)
 
 def threadProcessorJoin(threadName,openconnection,InputTable1,InputTable2,OutputTable,SortingColumnName,Table1Join,Table2Join,firstThreadBool,firstVal,secondVal):
-    joinCols = [Table1Join,Table2Join]
+    joinCols = [Table1Join,Table1Join]
     oper = ["g", "le"]
     if firstThreadBool:
         oper[0] = "ge"
@@ -104,6 +107,11 @@ def selectFun(openconnection,InputTable,SortingColumnName,firstVal,secondVal,fir
 
 def ParallelJoin (InputTable1, InputTable2, Table1JoinColumn, Table2JoinColumn, OutputTable, openconnection):
     #Implement ParallelJoin Here.
+    InputTable2 = InputTable2.lower()
+    InputTable1 = InputTable1.lower()
+    Table1JoinColumn = Table1JoinColumn.lower()
+    Table2JoinColumn = Table2JoinColumn.lower()
+    OutputTable = OutputTable.lower()
     createOutputTableJoin(OutputTable, InputTable1, InputTable2, openconnection, Table1JoinColumn,Table2JoinColumn)
     maxVal = max(getMaxMinOfAColumn(InputTable1, openconnection, Table1JoinColumn, "MAX"),getMaxMinOfAColumn(InputTable2, openconnection, Table2JoinColumn, "MAX"))
     minVal = min(getMaxMinOfAColumn(InputTable1, openconnection, Table1JoinColumn, "MIN"),getMaxMinOfAColumn(InputTable2, openconnection, Table2JoinColumn, "MIN"))
