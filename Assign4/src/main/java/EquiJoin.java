@@ -12,10 +12,8 @@ import java.util.List;
 public class EquiJoin
 {
     public static class Map extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
-
         private Text kjoin = new Text();
         private Text tuples = new Text();
-
         public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
             String line[] = value.toString().split(",");
             int len = line.length;
@@ -40,20 +38,14 @@ public class EquiJoin
 
     public static class Reduce extends MapReduceBase implements Reducer<Text, Text, Text, Text> {
         public void reduce(Text key, Iterator<Text> values, OutputCollector<Text,Text> output, Reporter reporter) throws IOException {
+            List<String>  firstTab = new ArrayList<String>();
+            List<String>  secondTab = new ArrayList<String>();
+            List<String>  writableObj = new ArrayList<String>();
 
-            List<String>  Table1 = new ArrayList<String>();
-            List<String>  Table2 = new ArrayList<String>();
-            //List<String>  RL = new ArrayList<String>();
-            //List<String>  SL = new ArrayList<String>();
-            List<String>  Total = new ArrayList<String>();
-            List<String>  Final = new ArrayList<String>();
-
-            List<String>  Tempo = new ArrayList<String>();
             Text result = new Text();
-            String table1Col = "";
+            String table1Col = null;
             boolean flag = true;
-            String jtuple = "";
-            String currentValue = "";
+
             while(values.hasNext())
             {
                 String value = values.next().toString();
@@ -64,25 +56,25 @@ public class EquiJoin
                     flag=false;
                 }
                 if(table1Col == valueSplit[0])
-                    Table1.add(value);
+                    firstTab.add(value);
                 else
-                    Table2.add(value);
-                Final.add(value);
+                    secondTab.add(value);
+                writableObj.add(value);
             }
-            String cur = "";
-            Final = Lists.reverse(Final);
+
+            writableObj = Lists.reverse(writableObj);
 
             //Clears the key-value if doesnt match
-            if(Table1.size() == 0 || Table2.size() ==0){
+            if(firstTab.size() == 0 || secondTab.size() ==0){
                 key.clear();
             }else{
-                for(int i=0;i<Final.size();i++)
+                for(int i=0;i<writableObj.size();i++)
                 {
-                    for(int j=i+1;j<Final.size();j++)
+                    for(int j=i+1;j<writableObj.size();j++)
                     {
-                        if(!Final.get(i).split(",")[0].equalsIgnoreCase(Final.get(j).split(",")[0]))
+                        if(!writableObj.get(i).split(",")[0].equalsIgnoreCase(writableObj.get(j).split(",")[0]))
                         {
-                            result.set(Final.get(i)+" ,"+Final.get(j));
+                            result.set(writableObj.get(i)+" ,"+writableObj.get(j));
                             output.collect(new Text(""), result);
                         }
                     }
