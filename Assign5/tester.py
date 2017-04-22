@@ -15,7 +15,7 @@ COLLECTION_NAME = "businessCollection"
 CITY_TO_SEARCH = "tempe"
 MAX_DISTANCE = 100
 CATEGORIES_TO_SEARCH = ["Fashion", "Food", "Cafes"]
-MY_LOCATION = ["", ""] #[LATITUDE, LONGITUDE]
+MY_LOCATION = [ "33.331229700000002","-111.642224"] #[LATITUDE, LONGITUDE]
 SAVE_LOCATION_1 = "findBusinessBasedOnCity.txt"
 SAVE_LOCATION_2 = "findBusinessBasedOnLocation.txt"
 
@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
         #Loading BusinessCollection from a json file to MongoDB
         print "Loading testData.json file in the " + COLLECTION_NAME + " present inside " + DATABASE_NAME
-        loadBusinessTable("testData.json", collection)
+        #loadBusinessTable("testData.json", collection)
     
         #Finding All Business name and address(full_address, city and state) present in CITY_TO_SEARCH
         print "Executing FindBusinessBasedOnCity function"
