@@ -4,16 +4,16 @@
 # Name: Satyam Rohit
 #
 
-from pymongo import MongoClient
-import os
-import sys
 import json
+
+from pymongo import MongoClient
+
 import Assignment5_Interface as Assignment5
 
 DATABASE_NAME = "ddsassignment5"
 COLLECTION_NAME = "businessCollection"
 CITY_TO_SEARCH = "tempe"
-MAX_DISTANCE = 100
+MAX_DISTANCE = 7
 CATEGORIES_TO_SEARCH = ["Fashion", "Food", "Cafes"]
 MY_LOCATION = [ "33.331229700000002","-111.642224"] #[LATITUDE, LONGITUDE]
 SAVE_LOCATION_1 = "findBusinessBasedOnCity.txt"
